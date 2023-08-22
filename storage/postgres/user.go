@@ -31,7 +31,7 @@ func (r *UserRepo) Create(ctx context.Context, req *models.UserCreate) (string, 
 
 	query = `
 		INSERT INTO users(id, login, password, name, age)
-		VALUES ($1, $2, $3, $4, $5, NOW())
+		VALUES ($1, $2, $3, $4, $5)
 	`
 	_, err := r.db.Exec(ctx, query,
 		id,
