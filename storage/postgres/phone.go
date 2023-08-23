@@ -23,22 +23,18 @@ func NewPhoneRepo(db *pgxpool.Pool) *PhoneRepo {
 	}
 }
 
-func (r *PhoneRepo) Create(ctx context.Context, req *models.UserCreate) (string, error) {
+func (r *PhoneRepo) Create(ctx context.Context, req *models.PhoneCreate) (string, error) {
 	var (
 		id    = uuid.New().String()
 		query string
 	)
 
 	query = `
-		INSERT INTO users(id, login, password, name, age)
+		INSERT INTO phone_numbers(id, user_id, phone, description, is_fax)
 		VALUES ($1, $2, $3, $4, $5)
 	`
 	_, err := r.db.Exec(ctx, query,
 		id,
-		req.Login,
-		req.Password,
-		req.Name,
-		req.Age,
 	)
 	if err != nil {
 		log.Println(err.Error())
@@ -47,49 +43,49 @@ func (r *PhoneRepo) Create(ctx context.Context, req *models.UserCreate) (string,
 	return id, nil
 }
 
-func (r *PhoneRepo) GetByID(ctx context.Context, req *models.UserPrimaryKey) (*models.User, error) {
+func (r *PhoneRepo) GetByID(ctx context.Context, req *models.PhonePrimaryKey) (*models.Phone, error) {
 
-	if len(req.Login) > 0 {
-		var (
-			query string
+	// if len(req.Login) > 0 {
+	// 	var (
+	// 		query string
 
-			id       sql.NullString
-			login    sql.NullString
-			password sql.NullString
-			name     sql.NullString
-			age      sql.NullInt64
-		)
-		query = `
-		SELECT
-			id,
-			login,
-			password,
-			name,
-			age
-		FROM users
-		WHERE login = $1
-	`
+	// 		id       sql.NullString
+	// 		login    sql.NullString
+	// 		password sql.NullString
+	// 		name     sql.NullString
+	// 		age      sql.NullInt64
+	// 	)
+	// 	query = `
+	// 	SELECT
+	// 		id,
+	// 		login,
+	// 		password,
+	// 		name,
+	// 		age
+	// 	FROM users
+	// 	WHERE login = $1
+	// `
 
-		err := r.db.QueryRow(ctx, query, req.Login).Scan(
-			&id,
-			&login,
-			&password,
-			&name,
-			&age,
-		)
+	// 	err := r.db.QueryRow(ctx, query, req.Login).Scan(
+	// 		&id,
+	// 		&login,
+	// 		&password,
+	// 		&name,
+	// 		&age,
+	// 	)
 
-		if err != nil {
-			return nil, err
-		}
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
 
-		return &models.User{
-			Id:       id.String,
-			Login:    login.String,
-			Password: password.String,
-			Name:     name.String,
-			Age:      int(age.Int64),
-		}, nil
-	}
+	// 	return &models.Phone{
+	// 		Id:       id.String,
+	// 		Login:    login.String,
+	// 		Password: password.String,
+	// 		Name:     name.String,
+	// 		Age:      int(age.Int64),
+	// 	}, nil
+	// }
 
 	var (
 		query string
@@ -108,7 +104,7 @@ func (r *PhoneRepo) GetByID(ctx context.Context, req *models.UserPrimaryKey) (*m
 			password,
 			name,
 			age
-		FROM users
+		FROM phone_numbers
 		WHERE id = $1
 	`
 
@@ -124,19 +120,15 @@ func (r *PhoneRepo) GetByID(ctx context.Context, req *models.UserPrimaryKey) (*m
 		return nil, err
 	}
 
-	return &models.User{
-		Id:       id.String,
-		Login:    login.String,
-		Password: password.String,
-		Name:     name.String,
-		Age:      int(age.Int64),
+	return &models.Phone{
+		Id: id.String,
 	}, nil
 }
 
-func (r *PhoneRepo) GetList(ctx context.Context, req *models.UserGetListRequest) (*models.UserGetListResponse, error) {
+func (r *PhoneRepo) GetList(ctx context.Context, req *models.PhoneGetListRequest) (*models.PhoneGetListResponse, error) {
 
 	var (
-		resp   = &models.UserGetListResponse{}
+		resp   = &models.PhoneGetListResponse{}
 		query  string
 		where  = " WHERE TRUE"
 		offset = " OFFSET 0"
@@ -151,7 +143,7 @@ func (r *PhoneRepo) GetList(ctx context.Context, req *models.UserGetListRequest)
 			password,
 			name,
 			age
-		FROM users
+		FROM phone_numbers
 	`
 
 	if req.Offset > 0 {
@@ -174,61 +166,41 @@ func (r *PhoneRepo) GetList(ctx context.Context, req *models.UserGetListRequest)
 
 	for rows.Next() {
 		var (
-			id       sql.NullString
-			login    sql.NullString
-			password sql.NullString
-			name     sql.NullString
-			age      sql.NullInt64
+			id sql.NullString
 		)
 
 		err := rows.Scan(
 			&resp.Count,
 			&id,
-			&login,
-			&password,
-			&name,
-			&age,
 		)
 
 		if err != nil {
 			return nil, err
 		}
 
-		resp.Users = append(resp.Users, &models.User{
-			Id:       id.String,
-			Login:    login.String,
-			Password: password.String,
-			Name:     name.String,
-			Age:      int(age.Int64),
+		resp.Phones = append(resp.Phones, &models.Phone{
+			Id: id.String,
 		})
 	}
 
 	return resp, nil
 }
 
-func (r *PhoneRepo) Update(ctx context.Context, req *models.UserUpdate) (int64, error) {
+func (r *PhoneRepo) Update(ctx context.Context, req *models.PhoneUpdate) (int64, error) {
 	var (
 		query  string
 		params map[string]interface{}
 	)
 	query = `
 		UPDATE
-			users
+			phone_numbers
 		SET
 			id = :id,
-			login = :login,
-			password = :password,
-			name = :name,
-			age = :age
 		WHERE id = :id
 	`
 
 	params = map[string]interface{}{
-		"id":       req.Id,
-		"login":    req.Login,
-		"password": req.Password,
-		"name":     req.Name,
-		"age":      req.Age,
+		"id": req.Id,
 	}
 
 	query, args := helper.ReplaceQueryParams(query, params)
@@ -241,9 +213,9 @@ func (r *PhoneRepo) Update(ctx context.Context, req *models.UserUpdate) (int64, 
 	return result.RowsAffected(), nil
 }
 
-func (r *PhoneRepo) Delete(ctx context.Context, req *models.UserPrimaryKey) error {
+func (r *PhoneRepo) Delete(ctx context.Context, req *models.PhonePrimaryKey) error {
 
-	_, err := r.db.Exec(ctx, "DELETE FROM users WHERE id = $1", req.Id)
+	_, err := r.db.Exec(ctx, "DELETE FROM phone_numbers WHERE id = $1", req.Id)
 
 	if err != nil {
 		return err

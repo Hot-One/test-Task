@@ -55,7 +55,7 @@ func (s *store) User() storage.UserRepoI {
 	return s.user
 }
 
-func (s *store) Phoen() storage.PhoneRepoI {
+func (s *store) Phone() storage.PhoneRepoI {
 
 	if s.phone == nil {
 		s.phone = NewPhoneRepo(s.db)

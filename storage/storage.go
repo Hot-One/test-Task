@@ -22,7 +22,7 @@ type UserRepoI interface {
 
 type PhoneRepoI interface {
 	Create(context.Context, *models.PhoneCreate) (string, error)
-	GetByID(context.Context, *models.PhonePrimaryKey) (*models.User, error)
+	GetByID(context.Context, *models.PhonePrimaryKey) (*models.Phone, error)
 	GetList(context.Context, *models.PhoneGetListRequest) (*models.PhoneGetListResponse, error)
 	Update(context.Context, *models.PhoneUpdate) (int64, error)
 	Delete(context.Context, *models.PhonePrimaryKey) error
