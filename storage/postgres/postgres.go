@@ -11,8 +11,9 @@ import (
 )
 
 type store struct {
-	db   *pgxpool.Pool
-	user *UserRepo
+	db    *pgxpool.Pool
+	user  *UserRepo
+	phone *PhoneRepo
 }
 
 func NewConnectionPostgres(cfg *config.Config) (storage.StorageI, error) {
@@ -52,4 +53,13 @@ func (s *store) User() storage.UserRepoI {
 	}
 
 	return s.user
+}
+
+func (s *store) Phoen() storage.PhoneRepoI {
+
+	if s.phone == nil {
+		s.phone = NewPhoneRepo(s.db)
+	}
+
+	return s.phone
 }

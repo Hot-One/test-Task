@@ -1,7 +1,13 @@
 package models
 
+type UserLogin struct {
+	Login    string `json:"login"`
+	Password string `json:"password"`
+}
+
 type UserPrimaryKey struct {
-	Id string `json:"id"`
+	Id    string `json:"id"`
+	Login string `json:"login"`
 }
 
 type User struct {

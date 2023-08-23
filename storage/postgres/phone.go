@@ -13,17 +13,17 @@ import (
 	"app/pkg/helper"
 )
 
-type UserRepo struct {
+type PhoneRepo struct {
 	db *pgxpool.Pool
 }
 
-func NewUserRepo(db *pgxpool.Pool) *UserRepo {
-	return &UserRepo{
+func NewPhoneRepo(db *pgxpool.Pool) *PhoneRepo {
+	return &PhoneRepo{
 		db: db,
 	}
 }
 
-func (r *UserRepo) Create(ctx context.Context, req *models.UserCreate) (string, error) {
+func (r *PhoneRepo) Create(ctx context.Context, req *models.UserCreate) (string, error) {
 	var (
 		id    = uuid.New().String()
 		query string
@@ -47,7 +47,8 @@ func (r *UserRepo) Create(ctx context.Context, req *models.UserCreate) (string, 
 	return id, nil
 }
 
-func (r *UserRepo) GetByID(ctx context.Context, req *models.UserPrimaryKey) (*models.User, error) {
+func (r *PhoneRepo) GetByID(ctx context.Context, req *models.UserPrimaryKey) (*models.User, error) {
+
 	if len(req.Login) > 0 {
 		var (
 			query string
@@ -132,7 +133,7 @@ func (r *UserRepo) GetByID(ctx context.Context, req *models.UserPrimaryKey) (*mo
 	}, nil
 }
 
-func (r *UserRepo) GetList(ctx context.Context, req *models.UserGetListRequest) (*models.UserGetListResponse, error) {
+func (r *PhoneRepo) GetList(ctx context.Context, req *models.UserGetListRequest) (*models.UserGetListResponse, error) {
 
 	var (
 		resp   = &models.UserGetListResponse{}
@@ -205,7 +206,7 @@ func (r *UserRepo) GetList(ctx context.Context, req *models.UserGetListRequest) 
 	return resp, nil
 }
 
-func (r *UserRepo) Update(ctx context.Context, req *models.UserUpdate) (int64, error) {
+func (r *PhoneRepo) Update(ctx context.Context, req *models.UserUpdate) (int64, error) {
 	var (
 		query  string
 		params map[string]interface{}
@@ -240,7 +241,7 @@ func (r *UserRepo) Update(ctx context.Context, req *models.UserUpdate) (int64, e
 	return result.RowsAffected(), nil
 }
 
-func (r *UserRepo) Delete(ctx context.Context, req *models.UserPrimaryKey) error {
+func (r *PhoneRepo) Delete(ctx context.Context, req *models.UserPrimaryKey) error {
 
 	_, err := r.db.Exec(ctx, "DELETE FROM users WHERE id = $1", req.Id)
 

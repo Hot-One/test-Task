@@ -23,6 +23,10 @@ func NewApi(r *gin.Engine, cfg *config.Config, storage storage.StorageI, logger 
 	r.PUT("/user/:id", handler.UpdateUser)
 	r.DELETE("/user/:id", handler.DeleteUser)
 
+	// Auth Api
+	r.POST("/user/login", handler.Login)
+	r.POST("/user/register", handler.Register)
+
 	url := ginSwagger.URL("swagger/doc.json") // The url pointing to API definition
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 }

@@ -27,11 +27,10 @@ type Config struct {
 	PostgresPort          int
 	PostgresMaxConnection int32
 
+	SecretKey string
+
 	DefaultOffset int
 	DefaultLimit  int
-
-	DefaultFrom int
-	DefaultTo   int
 }
 
 func Load() Config {
@@ -45,9 +44,6 @@ func Load() Config {
 	cfg.DefaultOffset = 0
 	cfg.DefaultLimit = 10
 
-	cfg.DefaultFrom = 0
-	cfg.DefaultTo = 1000000000
-
 	cfg.Environment = cast.ToString(getOrReturnDefaultValue("ENVIRONMENT", ReleaseMode))
 
 	cfg.ServerHost = cast.ToString(getOrReturnDefaultValue("SERVER_HOST", "localhost"))
@@ -60,6 +56,8 @@ func Load() Config {
 	cfg.PostgresPort = cast.ToInt(getOrReturnDefaultValue("POSTGRES_PORT", 5432))
 
 	cfg.PostgresMaxConnection = cast.ToInt32(getOrReturnDefaultValue("POSTGRES_PORT", 30))
+
+	cfg.SecretKey = cast.ToString(getOrReturnDefaultValue("SECRET_KEY", "bosit"))
 
 	cfg.DefaultOffset = cast.ToInt(getOrReturnDefaultValue("OFFSET", 0))
 	cfg.DefaultLimit = cast.ToInt(getOrReturnDefaultValue("LIMIT", 10))
